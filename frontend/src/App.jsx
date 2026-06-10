@@ -579,7 +579,7 @@ export default function App() {
   const openFilePicker = useCallback(() => {
     if (fileRef.current) {
       fileRef.current.value = "";
-      fileRef.current.click();
+      setTimeout(() => fileRef.current?.click(), 50);
     }
   }, []);
 
