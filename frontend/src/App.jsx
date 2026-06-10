@@ -611,9 +611,11 @@ export default function App() {
     finally { setLoading(false); }
   };
 
+  
   const resetAll = () => {
     setFile(null); setPreview(null); setResults(null); setError(null);
     setZoom(1); setBright(100); setVErr({});
+    setTimeout(() => fileRef.current?.click(), 100);
   };
 
   const findings = results?.findings || [];
@@ -647,7 +649,8 @@ export default function App() {
             <input ref={fileRef} type="file" accept="image/*"
               onChange={e => { handleFile(e.target.files[0]); e.target.value = ""; }}
               style={{ display: "none" }} />
-            <button className="tbtn" onClick={() => { resetAll(); setTimeout(openFilePicker, 50); }}>
+            
+            <button className="tbtn" onClick={() => { resetAll(); }}>
               📂 Load Study
               <span className="tt">Open new X-Ray file</span>
             </button>
