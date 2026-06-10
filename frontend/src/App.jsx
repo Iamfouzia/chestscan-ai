@@ -491,7 +491,10 @@ RECOMMENDATION: Specific actionable next steps.`;
   if (!res.ok) throw new Error(`Groq API Error ${res.status}: ${await res.text()}`);
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content || "";
-  return JSON.parse(raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim());
+  const cleaned = raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No valid JSON in response");
+  return JSON.parse(jsonMatch[0]);
 };
 
 const nSev = (s = "") => { const u = s.toUpperCase(); return u === "HIGH" ? "HIGH" : u === "MEDIUM" ? "MEDIUM" : "NORMAL"; };
@@ -698,7 +701,7 @@ export default function App() {
               </div>
               <div>
 
-                
+
                 <input className={`s-input ${vErr.age ? "err" : ""}`} placeholder="Age *" type="text" maxLength="3"
                   value={patAge} onChange={e => { const v = e.target.value.replace(/[^0-9]/g, ""); setPatAge(v); setVErr(p => ({ ...p, age: "" })); }} />
                 {vErr.age && <div className="ferr">⚠ {vErr.age}</div>}
@@ -714,7 +717,7 @@ export default function App() {
               <div>
                 <select className={`s-input ${vErr.sex ? "err" : ""}`} value={patSex}
                   onChange={e => { setPatSex(e.target.value); setVErr(p => ({ ...p, sex: "" })); }}
-                  style={{appearance:"none", WebkitAppearance:"none"}}>
+                  style={{ appearance: "none", WebkitAppearance: "none" }}>
                   <option value="" disabled>Select Sex *</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
