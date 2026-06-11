@@ -1,15 +1,17 @@
 # ChestScan AI
 
-**AI-powered chest X-ray analysis platform for rapid, structured radiology reporting.**
+**An AI-powered chest X-ray analysis tool that generates structured radiology reports automatically.**
 
-🔗 **Live Demo:** [chestscan-ai-seven.vercel.app](https://chestscan-ai-seven.vercel.app)  
-📂 **Repository:** [github.com/Iamfouzia/chestscan-ai](https://github.com/Iamfouzia/chestscan-ai)
+
+🔗 **Live Demo:**
+[chestscan-ai-seven.vercel.app](https://chestscan-ai-seven.vercel.app)  
+
 
 ---
 
 ## Overview
 
-ChestScan AI is a clinical-grade web application that analyzes chest X-ray images using multimodal AI. It generates structured radiology reports covering 9 anatomical structures, with severity classification and confidence scoring — in seconds.
+ChestScan AI is a clinical-grade web application that analyzes chest X-ray images using multimodal AI. It generates structured radiology reports covering 9 anatomical structures, with severity classification and confidence scoring in seconds.
 
 Built for radiologists, medical students, and healthcare developers who need fast, explainable AI-assisted CXR interpretation.
 
@@ -93,9 +95,9 @@ Rendered UI + PDF export
 ```
 chestscan-ai/
 ├── src/
-│   └── App.jsx          # Main application (single-file architecture)
+│   └── App.jsx          
 ├── public/
-├── .env                 # API key (not committed)
+├── .env                
 ├── .gitignore
 ├── package.json
 ├── vite.config.js
@@ -117,12 +119,12 @@ cd chestscan-ai
 npm install
 
 # Create environment file
-New-Item .env   # Windows PowerShell
+New-Item .env   
 # or
-touch .env      # Mac/Linux
+touch .env      
 
 # Add your Groq API key to .env
-VITE_GROQ_API_KEY=your_groq_api_key_here
+VITE_GROQ_API_KEY=your api key
 
 # Start development server
 npm run dev
@@ -149,7 +151,7 @@ Or connect GitHub repo directly at [vercel.com](https://vercel.com) and add `VIT
 ## Limitations
 
 - Analysis accuracy depends on image quality and AI model output
-- Not validated for clinical use — research and educational purposes only
+- Not validated for clinical use research and educational purposes only
 - Requires valid Groq API key with sufficient rate limits
 - PA view X-rays produce most accurate results; AP or lateral views may reduce accuracy
 
