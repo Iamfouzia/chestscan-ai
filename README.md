@@ -130,7 +130,7 @@ VITE_GROQ_API_KEY=your api key
 npm run dev
 ```
 
-**Get Groq API Key:** [console.groq.com](https://console.groq.com) → API Keys → Create Key
+**Get Groq API Key:** [console.groq.com](https://console.groq.com) 
 
 ---
 
