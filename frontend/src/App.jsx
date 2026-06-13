@@ -425,7 +425,6 @@ const STYLES = `
   }
 `;
 
-/* ═══════════════════ Helpers ═══════════════════ */
 const dateStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 const parseSections = (text = "") => {
@@ -446,6 +445,7 @@ const parseSections = (text = "") => {
   })).filter(s => s.text.length > 0);
 };
 
+
 const toBase64 = (file) => new Promise((res, rej) => {
   const r = new FileReader();
   r.onload = (e) => res({ dataUrl: r.result });
@@ -453,49 +453,41 @@ const toBase64 = (file) => new Promise((res, rej) => {
   r.readAsDataURL(file);
 });
 
+const extractJSON = (raw) => {
+  try { return JSON.parse(raw); } catch {}
+  let cleaned = raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("No JSON object found in response");
+  cleaned = cleaned.slice(start, end + 1);
+  cleaned = cleaned
+    .replace(/,\s*}/g, "}")
+    .replace(/,\s*]/g, "]")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/:\s*'([^']*)'/g, ': "$1"')
+    .replace(/'([^']+)'\s*:/g, '"$1":');
+  try { return JSON.parse(cleaned); }
+  catch (e) { throw new Error("Could not parse AI response: " + e.message); }
+};
+
 const callGroq = async (dataUrl, name, age, sex, caseId, apiKey) => {
-  const prompt = `You are an expert radiologist with 20 years of experience. Analyze this chest X-ray systematically like a board-certified radiologist. Respond ONLY with valid JSON, no markdown, no extra text:
-{
-  "findings": [
-    { "name": "Cardiothoracic Ratio", "detail": "detailed observation here", "severity": "NORMAL", "confidence": 0.94 }
-  ],
-  "report": "CLINICAL FINDINGS:\\n\\n[detailed paragraph]\\n\\nIMPRESSION:\\n\\n[2-3 sentences]\\n\\nRECOMMENDATION:\\n\\n[specific next steps]"
-}
-
-Patient: ${name || "Anonymous"}, Age: ${age || "?"}, Sex: ${sex || "?"}, Case: ${caseId}
-
-FINDINGS: Analyze exactly 8-9 structures in this order: Cardiothoracic Ratio, Heart Size/Shape, Right Lung Field, Left Lung Field, Costophrenic Angles, Pleural Spaces, Mediastinum & Trachea, Diaphragm, Bony Structures & Soft Tissues.
-For each finding: describe exactly what you see, not what is normal.
-severity: NORMAL if within limits, MEDIUM if borderline or needs attention, HIGH if abnormal or critical.
-confidence: 0.70 to 0.99 based on image clarity.
-If any metallic artifact or foreign body is visible, add it as separate finding with severity NORMAL and note location.
-
-CLINICAL FINDINGS: Write a detailed professional paragraph (5-8 sentences) describing ALL structures systematically: CTR value, heart morphology, lung fields bilaterally, costophrenic angles, pleural spaces, mediastinal width, tracheal position, diaphragm, bony structures, soft tissues.
-IMPRESSION: Concise 2-3 sentence clinical summary.
-RECOMMENDATION: Specific actionable next steps.`;
-
+  const prompt = `You are an expert radiologist. Analyze this chest X-ray. CRITICAL: Respond ONLY with valid JSON. No markdown, no backticks. {"findings":[{"name":"Cardiothoracic Ratio","detail":"observation","severity":"NORMAL","confidence":0.94}],"report":"CLINICAL FINDINGS:\\n\\n[paragraph]\\n\\nIMPRESSION:\\n\\n[summary]\\n\\nRECOMMENDATION:\\n\\n[steps]"} Patient: ${name||"Anonymous"}, Age: ${age||"?"}, Sex: ${sex||"?"}, Case: ${caseId} Analyze 8 structures: Cardiothoracic Ratio, Heart Size, Right Lung Field, Left Lung Field, Costophrenic Angles, Pleural Spaces, Mediastinum, Bony Structures. severity: "NORMAL", "MEDIUM", or "HIGH". confidence: 0.70-0.99. Valid JSON only.`;
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
     body: JSON.stringify({
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      max_tokens: 1200,
-      messages: [{
-        role: "user", content: [
-          { type: "image_url", image_url: { url: dataUrl } },
-          { type: "text", text: prompt }
-        ]
-      }]
+      max_tokens: 1200, temperature: 0.1,
+      messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: dataUrl } }, { type: "text", text: prompt }] }]
     })
   });
   if (!res.ok) throw new Error(`Groq API Error ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  const raw = data.choices?.[0]?.message?.content || "";
-  const cleaned = raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
-  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("No valid JSON in response");
-  return JSON.parse(jsonMatch[0]);
+  return extractJSON(data.choices?.[0]?.message?.content || "");
 };
+
+
+  
 
 const nSev = (s = "") => { const u = s.toUpperCase(); return u === "HIGH" ? "HIGH" : u === "MEDIUM" ? "MEDIUM" : "NORMAL"; };
 const sevC = (s) => s === "HIGH" ? "h" : s === "MEDIUM" ? "m" : "n";
