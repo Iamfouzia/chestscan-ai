@@ -155,3 +155,18 @@ Or connect GitHub repo directly at [vercel.com](https://vercel.com) and add `VIT
 - Requires valid Groq API key with sufficient rate limits
 - PA view X-rays produce most accurate results; AP or lateral views may reduce accuracy
 
+- ## Author
+
+**Fouzia Khan**
+
+[GitHub](https://github.com/Iamfouzia) · [LinkedIn](https://linkedin.com/in/fouzia-khan-35a73a258)
+
+
+
+
+## Screenshots
+<img width="1900" height="907" alt="chest(1569)" src="https://github.com/user-attachments/assets/f2f27017-8f1e-40d3-a25b-ffd3931c3c4d" />
+<img width="1899" height="905" alt="chest(1570)" src="https://github.com/user-attachments/assets/6f3779ab-c930-4d10-8fc4-01855d6cac56" />
+
+
+
